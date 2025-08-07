@@ -1,16 +1,8 @@
 from random import Random
 
-# Player stats
-PROFICIENCY_BONUS = 3
-# Enemy stats
-ENEMY_ARMOR_CLASS = 11
-# Simulation stats
-SIMULATION_ROUNDS = 50000
-ZEALOT_WIN_TOTAL = 0
-BERSERKER_WIN_TOTAL = 0
-
 class Barbarian:
-    def __init__(self, HP:int, level:int):
+    def __init__(self, AC:int, HP:int, level:int):
+        self.AC = AC
         self.HP = HP
         self.level = level
 
@@ -25,7 +17,7 @@ class Barbarian:
         Second_Damage_Roll = Random().randint(Min_DMG, 6)
         return First_Damage_Roll + Second_Damage_Roll
 
-    def Attack(self, GWM_DAMAGE_BONUS=PROFICIENCY_BONUS, MINIMUM_DAMAGE=1) -> int:
+    def Attack(self, GWM_DAMAGE_BONUS=3, MINIMUM_DAMAGE=1, enemy_AC=10) -> int:
         TOTAL_DAMAGE = 0
 
         First_Attack_To_Hit_Roll = self.Reckless_Attack()
@@ -33,9 +25,9 @@ class Barbarian:
 
         TOTAL_DAMAGE_BEFORE_ATTACKING = TOTAL_DAMAGE
 
-        if First_Attack_To_Hit_Roll >= ENEMY_ARMOR_CLASS:
+        if First_Attack_To_Hit_Roll >= enemy_AC:
             TOTAL_DAMAGE += self.Attack_Damage(MINIMUM_DAMAGE) + GWM_DAMAGE_BONUS
-        if Second_Attack_To_Hit_Roll >= ENEMY_ARMOR_CLASS:
+        if Second_Attack_To_Hit_Roll >= enemy_AC:
             TOTAL_DAMAGE += self.Attack_Damage(MINIMUM_DAMAGE) + GWM_DAMAGE_BONUS
 
         # if TOTAL_DAMAGE > TOTAL_DAMAGE_BEFORE_ATTACKING:
@@ -56,28 +48,3 @@ class Berserker(Barbarian):
         Second_Damage_Roll = Random().randint(Min_DMG, 6)
 
         return First_Damage_Roll + Second_Damage_Roll
-
-MyZealot = Zealot(100, 4)
-MyBerserker = Berserker(100, 4)
-
-count = 0
-while count < SIMULATION_ROUNDS:
-    while MyZealot.HP > 0 and MyBerserker.HP > 0:
-        MyBerserker.HP -= MyZealot.Attack()
-        if MyBerserker.HP > 0:
-            MyZealot.HP -= MyBerserker.Attack()
-    if MyZealot.HP > 0:
-        ZEALOT_WIN_TOTAL += 1
-    else:
-        BERSERKER_WIN_TOTAL += 1
-    count += 1
-
-print(f"Total wins zealot: {ZEALOT_WIN_TOTAL} Total wins berserker: {BERSERKER_WIN_TOTAL}")
-# print(f"Average damage per round GWM: {TOTAL_DAMAGE_DEALT / SIMULATION_ROUNDS}")
-#
-# TOTAL_DAMAGE_DEALT = 0
-# count = 0
-# while count < SIMULATION_ROUNDS:
-#     Attack(GWM_DAMAGE_BONUS = 0, MINIMUM_DAMAGE = 3)
-#     count += 1
-# print(f"Average damage per round GWF: {TOTAL_DAMAGE_DEALT / SIMULATION_ROUNDS}")
