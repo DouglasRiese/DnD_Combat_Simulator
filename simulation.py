@@ -2,22 +2,19 @@ from classes import Zealot, Berserker
 
 #Player stats
 PROFICIENCY_BONUS = 3
-# Enemy stats
-ENEMY_ARMOR_CLASS = 11
 # Simulation stats
 SIMULATION_ROUNDS = 50000
 ZEALOT_WIN_TOTAL = 0
 BERSERKER_WIN_TOTAL = 0
 
-MyZealot = Zealot(100, 4)
-MyBerserker = Berserker(100, 4)
-
 count = 0
 while count < SIMULATION_ROUNDS:
+    MyZealot = Zealot(10, 100, 4)
+    MyBerserker = Berserker(10, 100, 4)
     while MyZealot.HP > 0 and MyBerserker.HP > 0:
-        MyBerserker.HP -= MyZealot.Attack()
+        MyZealot.HP -= MyBerserker.Attack()
         if MyBerserker.HP > 0:
-            MyZealot.HP -= MyBerserker.Attack()
+            MyBerserker.HP -= MyZealot.Attack()
     if MyZealot.HP > 0:
         ZEALOT_WIN_TOTAL += 1
     else:

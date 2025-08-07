@@ -36,12 +36,12 @@ class Barbarian:
         return TOTAL_DAMAGE
 
 class Zealot(Barbarian):
-    def __init__(self, HP, level):
-        super().__init__(HP, level)
+    def __init__(self, AC, HP, level):
+        super().__init__(AC, HP, level)
 
 class Berserker(Barbarian):
-    def __init__(self, HP, level):
-        super().__init__(HP, level)
+    def __init__(self, AC, HP, level):
+        super().__init__(AC, HP, level)
 
     def Frenzy_Bonus_Damage(Min_DMG):
         First_Damage_Roll = Random().randint(Min_DMG, 6)
