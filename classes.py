@@ -1,10 +1,19 @@
 from random import Random
 
+from openpyxl.packaging.manifest import Override
+
+
 class Barbarian:
     def __init__(self, AC:int, HP:int, level:int):
         self.AC = AC
         self.HP = HP
         self.level = level
+        if self.level < 9:
+            self.RAGE_DAMAGE_BONUS = 2
+        elif self.level < 16:
+            self.RAGE_DAMAGE_BONUS = 3
+        else:
+            self.RAGE_DAMAGE_BONUS = 4
 
     def Reckless_Attack(self) -> int:
         First_To_Hit_Roll = Random().randint(1, 20)
@@ -17,7 +26,7 @@ class Barbarian:
         Second_Damage_Roll = Random().randint(Min_DMG, 6)
         return First_Damage_Roll + Second_Damage_Roll
 
-    def Attack(self, GWM_DAMAGE_BONUS=3, MINIMUM_DAMAGE=1, enemy_AC=10) -> int:
+    def Melee_Attack(self, GWM_DAMAGE_BONUS=3, MINIMUM_DAMAGE=1, enemy_AC=10) -> int:
         TOTAL_DAMAGE = 0
 
         First_Attack_To_Hit_Roll = self.Reckless_Attack()
@@ -43,8 +52,11 @@ class Berserker(Barbarian):
     def __init__(self, AC, HP, level):
         super().__init__(AC, HP, level)
 
-    def Frenzy_Bonus_Damage(Min_DMG):
-        First_Damage_Roll = Random().randint(Min_DMG, 6)
-        Second_Damage_Roll = Random().randint(Min_DMG, 6)
+    def Melee_Attack(self, GWM_DAMAGE_BONUS=3, MINIMUM_DAMAGE=1, enemy_AC=10):
+        Attack_Damage = super().Melee_Attack(GWM_DAMAGE_BONUS=3, MINIMUM_DAMAGE=1, enemy_AC=10)
 
-        return First_Damage_Roll + Second_Damage_Roll
+        if Attack_Damage > 0:
+            for i in range(self.RAGE_DAMAGE_BONUS):
+                Attack_Damage += Random().randint(MINIMUM_DAMAGE, 6)
+
+        return Attack_Damage
