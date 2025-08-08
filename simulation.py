@@ -1,16 +1,14 @@
-from classes import Zealot, Berserker, Barbarian
+from classes import Player
 
 class CombatSimulator:
     def __init__(self):
-        #Player stats
-        self.PROFICIENCY_BONUS = 3
         # Simulation stats
         self.SIMULATION_ROUNDS = 5000
 
     def attack(self, attacker, defender):
         defender.HP -= attacker.Melee_Attack()
 
-    def round(self, first_combatant, second_combatant):
+    def combat(self, first_combatant, second_combatant):
 
         while first_combatant.HP > 0 and second_combatant.HP > 0:
             self.attack(first_combatant, second_combatant)
@@ -20,23 +18,23 @@ class CombatSimulator:
                 second_combatant.bonus_action()
 
         if first_combatant.HP > 0:
-            first_combatant.WIN_TOTAL += 1
+            first_combatant.total_wins += 1
         else:
-            second_combatant.WIN_TOTAL += 1
+            second_combatant.total_wins += 1
 
     def run_simulation(self):
-        my_zealot = Zealot(10, 100, 4, 0)
-        my_berserker = Berserker(10, 100, 4, 0)
+
+        first_player = Player(20, 14, 20, 10, 10, 10).Barbarian.Zealot
+        second_player = Player(20, 14, 20, 10, 10, 10).Barbarian.Berserker
         for _ in range(self.SIMULATION_ROUNDS):
-            self.round(my_zealot, my_berserker)
-            my_zealot.HP = 100
-            my_berserker.HP = 100
-            self.round(my_berserker, my_zealot)
-            my_zealot.HP = 100
-            my_berserker.HP = 100
+            self.combat(first_player, second_player)
+            first_player.HP = 100
+            second_player.HP = 100
+            self.combat(second_player, first_player)
+            first_player.HP = 100
+            second_player.HP = 100
 
-        print(f"Total wins zealot: {my_zealot.WIN_TOTAL} Total wins berserker: {my_berserker.WIN_TOTAL}")
-
+        print(f"Total wins zealot: {first_player.total_wins} Total wins berserker: {second_player.total_wins}")
 
 simulator = CombatSimulator()
 simulator.run_simulation()

@@ -1,79 +1,122 @@
 from random import Random
+from enum import Enum
 
-class Barbarian:
-    def __init__(self, AC:int, HP:int, level:int, WIN_TOTAL=0):
-        self.AC = AC
-        self.HP = HP
-        self.level = level
-        if self.level < 9:
-            self.RAGE_DAMAGE_BONUS = 2
-        elif self.level < 16:
-            self.RAGE_DAMAGE_BONUS = 3
+class SubClass(Enum):
+    BERSERKER = "Berserker"
+    ZEALOT = "Zealot"
+
+class Player:
+    def __init__(self, str, dex, con, int, wis, cha):
+        (self.str, self.dex, self.con, self.int, self.wis, self.cha) = str, dex, con, int, wis, cha
+        self.bonus_dmg = 0
+        self.Feats = self.Feats(self)
+        self.character_level = 0
+        if self.character_level < 5:
+            self.proficiency = 2
+        elif self.character_level < 9:
+            self.proficiency = 3
+        elif self.character_level < 13:
+            self.proficiency = 4
+        elif self.character_level < 17:
+            self.proficiency = 5
         else:
-            self.RAGE_DAMAGE_BONUS = 4
-        self.WIN_TOTAL = WIN_TOTAL
+            self.proficiency = 6
 
-    def Reckless_Attack(self) -> int:
-        first_to_hit_roll = Random().randint(1, 20)
-        second_to_hit_roll = Random().randint(1, 20)
+    class Feats:
+        def __init__(self, player):
+            self.player = player
 
-        return first_to_hit_roll if first_to_hit_roll > second_to_hit_roll else second_to_hit_roll
+        def Great_Weapon_Master(self):
+            self.player.bonus_dmg += self.player.proficiency
 
-    def Attack_Damage(self, Min_DMG) -> int:
-        first_damage_roll = Random().randint(Min_DMG, 6)
-        second_damage_roll = Random().randint(Min_DMG, 6)
-        return first_damage_roll + second_damage_roll
+    class Barbarian:
+        def __init__(self, player, AC:int, HP:int, level:int, subclass = None):
+            super().__init__()
+            (self.player, self.AC, self.HP, self.level, self.total_wins) = player, AC, HP, level, 0
+            self.subclass = subclass
 
-    def Melee_Attack(self, GWM_DAMAGE_BONUS=0, MINIMUM_DAMAGE=1, enemy_AC=10) -> int:
-        total_damage = 0
+            self.player.character_level += level
+            if self.level < 9:
+                self.rage_damage_bonus = 2
+            elif self.level < 16:
+                self.rage_damage_bonus = 3
+            else:
+                self.rage_damage_bonus = 4
 
-        first_attack_to_hit_roll = self.Reckless_Attack()
-        second_attack_to_hit_roll = self.Reckless_Attack()
+            if self.subclass.ZEALOT:
+                self.subclass = self.Zealot(self)
+            if self.subclass.BERSERKER:
+                self.subclass = self.Berserker(self)
 
-        if first_attack_to_hit_roll >= enemy_AC:
-            total_damage += self.Attack_Damage(MINIMUM_DAMAGE) + GWM_DAMAGE_BONUS
-        if second_attack_to_hit_roll >= enemy_AC:
-            total_damage += self.Attack_Damage(MINIMUM_DAMAGE) + GWM_DAMAGE_BONUS
+        def Reckless_Attack(self) -> int:
+            first_to_hit_roll = Random().randint(1, 20)
+            second_to_hit_roll = Random().randint(1, 20)
 
-        return total_damage
+            return first_to_hit_roll if first_to_hit_roll > second_to_hit_roll else second_to_hit_roll
 
-    def bonus_action(self):
-        pass
+        def Attack_Damage(self, min_dmg) -> int:
+            first_damage_roll = Random().randint(min_dmg, 6)
+            second_damage_roll = Random().randint(min_dmg, 6)
+            return first_damage_roll + second_damage_roll
 
-class Zealot(Barbarian):
-    def __init__(self, AC, HP, level, WIN_TOTAL):
-        super().__init__(AC, HP, level, WIN_TOTAL)
-        if self.level < 6:
-            self.healing_dice = 4
-        elif self.level < 12:
-            self.healing_dice = 5
-        elif self.level < 17:
-            self.healing_dice = 6
-        else:
-            self.healing_dice = 7
+        def Melee_Attack(self, GWM_bonus_dmg=0, min_dmg=1, enemy_AC=10) -> int:
+            total_damage = 0
 
-    def Melee_Attack(self, GWM_DAMAGE_BONUS=0, MINIMUM_DAMAGE=1, enemy_AC=10):
-        damage = super().Melee_Attack(GWM_DAMAGE_BONUS=0, MINIMUM_DAMAGE=1, enemy_AC=10)
+            first_attack_to_hit_roll = self.Reckless_Attack()
+            second_attack_to_hit_roll = self.Reckless_Attack()
 
-        if damage > 0:
-            damage += Random().randint(MINIMUM_DAMAGE, 6) + self.level / 2
+            if first_attack_to_hit_roll >= enemy_AC:
+                total_damage += self.Attack_Damage(min_dmg) + GWM_bonus_dmg
+            if second_attack_to_hit_roll >= enemy_AC:
+                total_damage += self.Attack_Damage(min_dmg) + GWM_bonus_dmg
 
-        return damage
+            return total_damage
 
-    def bonus_action(self):
-        if self.HP < 50:
-            for i in range(self.healing_dice):
-                self.HP += Random().randint(1, 12)
+        def bonus_action(self):
+            pass
 
-class Berserker(Barbarian):
-    def __init__(self, AC, HP, level, WIN_TOTAL):
-        super().__init__(AC, HP, level, WIN_TOTAL)
+        class Zealot:
+            def __init__(self, barbarian):
+                super().__init__()
+                self.barbarian = barbarian
+                if self.barbarian.level < 6:
+                    self.healing_dice = 4
+                elif self.barbarian.level < 12:
+                    self.healing_dice = 5
+                elif self.barbarian.level < 17:
+                    self.healing_dice = 6
+                else:
+                    self.healing_dice = 7
 
-    def Melee_Attack(self, GWM_DAMAGE_BONUS=0, MINIMUM_DAMAGE=1, enemy_AC=10):
-        damage = super().Melee_Attack(GWM_DAMAGE_BONUS=0, MINIMUM_DAMAGE=1, enemy_AC=10)
+            def Melee_Attack(self, GWM_bonus_dmg=0, min_dmg=1, enemy_AC=10):
+                damage = self.barbarian.Melee_Attack(GWM_bonus_dmg=0, min_dmg=1, enemy_AC=10)
 
-        if damage > 0:
-            for i in range(self.RAGE_DAMAGE_BONUS):
-                damage += Random().randint(MINIMUM_DAMAGE, 6)
+                if damage > 0:
+                    damage += Random().randint(min_dmg, 6) + self.barbarian.level / 2
 
-        return damage
+                return damage
+
+            def bonus_action(self):
+                if self.barbarian.HP < 50:
+                    for i in range(self.healing_dice):
+                        self.barbarian.HP += Random().randint(1, 12)
+
+        class Berserker:
+            def __init__(self, barbarian):
+                self.barbarian = barbarian
+                super().__init__()
+
+            def Melee_Attack(self, GWM_bonus_dmg=0, min_dmg=1, enemy_AC=10):
+                damage = self.barbarian.Melee_Attack(GWM_bonus_dmg=0, min_dmg=1, enemy_AC=10)
+
+                if damage > 0:
+                    for i in range(self.barbarian.rage_damage_bonus):
+                        damage += Random().randint(min_dmg, 6)
+
+                return damage
+
+    # class Fighter:
+    #     def __init__(self, player, AC: int, HP: int, level: int, subclass=None):
+    #         super().__init__()
+    #         (self.player, self.AC, self.HP, self.level, self.total_wins) = player, AC, HP, level, 0
+    #         self.subclass = subclass
