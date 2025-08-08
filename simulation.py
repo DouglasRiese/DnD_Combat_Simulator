@@ -24,7 +24,7 @@ class CombatSimulator:
 
     def run_simulation(self):
 
-        first_player = Player(20, 14, 20, 10, 10, 10).Barbarian.Zealot
+        first_player = Player(20, 14, 20, 10, 10, 10).Feats.Barbarian.Fighter.Zealot
         second_player = Player(20, 14, 20, 10, 10, 10).Barbarian.Berserker
         for _ in range(self.SIMULATION_ROUNDS):
             self.combat(first_player, second_player)

@@ -8,9 +8,13 @@ class SubClass(Enum):
 class Player:
     def __init__(self, str, dex, con, int, wis, cha):
         (self.str, self.dex, self.con, self.int, self.wis, self.cha) = str, dex, con, int, wis, cha
+        self.total_wins = 0
         self.bonus_dmg = 0
         self.Feats = self.Feats(self)
+        self.barbarian = self.Barbarian(self)
+        self.fighter = self.Fighter(self)
         self.character_level = 0
+        #TODO: these ifs need to not just run on init
         if self.character_level < 5:
             self.proficiency = 2
         elif self.character_level < 9:
@@ -31,8 +35,7 @@ class Player:
 
     class Barbarian:
         def __init__(self, player, AC:int, HP:int, level:int, subclass = None):
-            super().__init__()
-            (self.player, self.AC, self.HP, self.level, self.total_wins) = player, AC, HP, level, 0
+            (self.player, self.AC, self.HP, self.level) = player, AC, HP, level
             self.subclass = subclass
 
             self.player.character_level += level
@@ -115,8 +118,7 @@ class Player:
 
                 return damage
 
-    # class Fighter:
-    #     def __init__(self, player, AC: int, HP: int, level: int, subclass=None):
-    #         super().__init__()
-    #         (self.player, self.AC, self.HP, self.level, self.total_wins) = player, AC, HP, level, 0
-    #         self.subclass = subclass
+    class Fighter:
+        def __init__(self, player, AC: int, HP: int, level: int, subclass=None):
+            (self.player, self.AC, self.HP, self.level, self.total_wins) = player, AC, HP, level, 0
+            self.subclass = subclass
