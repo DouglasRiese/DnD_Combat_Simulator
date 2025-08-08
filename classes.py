@@ -11,8 +11,6 @@ class Player:
         self.total_wins = 0
         self.bonus_dmg = 0
         self.Feats = self.Feats(self)
-        self.barbarian = self.Barbarian(self)
-        self.fighter = self.Fighter(self)
         self.character_level = 0
         #TODO: these ifs need to not just run on init
         if self.character_level < 5:
@@ -25,6 +23,9 @@ class Player:
             self.proficiency = 5
         else:
             self.proficiency = 6
+        #Classes must be initialized last
+        self.barbarian = self.Barbarian(self, 10, 100, 4)
+        self.fighter = self.Fighter(self, 10, 100, 4)
 
     class Feats:
         def __init__(self, player):
@@ -80,7 +81,6 @@ class Player:
 
         class Zealot:
             def __init__(self, barbarian):
-                super().__init__()
                 self.barbarian = barbarian
                 if self.barbarian.level < 6:
                     self.healing_dice = 4
@@ -107,7 +107,6 @@ class Player:
         class Berserker:
             def __init__(self, barbarian):
                 self.barbarian = barbarian
-                super().__init__()
 
             def Melee_Attack(self, GWM_bonus_dmg=0, min_dmg=1, enemy_AC=10):
                 damage = self.barbarian.Melee_Attack(GWM_bonus_dmg=0, min_dmg=1, enemy_AC=10)
